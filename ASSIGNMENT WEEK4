@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Doubly linked list node structure
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to display doubly linked list
+void display(struct Node* head) {
+    struct Node* temp = head;
+    printf("\nDoubly Linked List: ");
+    while (temp != NULL) {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// Add element at the end of doubly linked list
+struct Node* insertEnd(struct Node* head, int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL)
+        return newNode;
+
+    struct Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+    return head;
+}
+
+// Add element between two nodes (after given position)
+struct Node* insertBetween(struct Node* head, int pos, int data) {
+    struct Node* newNode = createNode(data);
+    struct Node* temp = head;
+
+    for (int i = 1; i < pos && temp != NULL; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Position out of range!\n");
+        free(newNode);
+        return head;
+    }
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+    temp->next = newNode;
+
+    return head;
+}
+
+// Recursive function to delete all elements in the list
+void deleteAll(struct Node* head) {
+    if (head == NULL)
+        return;
+    deleteAll(head->next);
+    free(head);
+}
+
+// Main function demonstrating all operations
+int main() {
+    struct Node* head = NULL;
+
+    // Adding elements at the end
+    head = insertEnd(head, 10);
+    head = insertEnd(head, 20);
+    head = insertEnd(head, 30);
+    display(head);
+
+    // Adding an element between two existing nodes
+    head = insertBetween(head, 1, 15); // after 1st node
+    head = insertBetween(head, 3, 25); // after 3rd node
+    display(head);
+
+    // Delete all elements recursively
+    deleteAll(head);
+    head = NULL;
+    printf("\nAll nodes deleted recursively.\n");
+
+    return 0;
+}
+
+/* 
+------------------------------------------------------
+🧾 DIFFERENCE BETWEEN CIRCULAR AND NORMAL LINKED LIST
+------------------------------------------------------
+1. Normal Linked List:
+   - Last node points to NULL.
+   - Traversal ends when next == NULL.
+
+2. Circular Linked List:
+   - Last node points back to the first node.
+   - Traversal continues infinitely unless stopped.
+   - Used in round-robin scheduling or buffering.
+
+------------------------------------------------------
+📊 LINKED LIST VS. SORTING ALGORITHMS (ARRAYS)
+------------------------------------------------------
+| Aspect              | Linked List                     | Array/Sorting Algorithms           |
+|---------------------|----------------------------------|------------------------------------|
+| Memory Layout       | Dynamic (nodes, pointers)        | Contiguous (fixed size)            |
+| Access Time         | Sequential (O(n))                | Random access (O(1))               |
+| Insertion/Deletion  | Easy (O(1) if pointer known)     | Costly (O(n) due to shifting)      |
+| Sorting Used        | Merge/Insertion Sort (preferred) | Quick/Heap Sort (preferred)        |
+| Circular Advantage  | Continuous traversal             | Needs index reset after each pass  |
+------------------------------------------------------
+*/
